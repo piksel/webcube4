@@ -39,11 +39,11 @@ A Bash+Javascript script to connect/disconnect the WebCube4 (Huawei E8378) 4G/LT
 ## Usage
 
 ```bash
-$ ./webcube4.sh
+$ bash webcube4.sh
 
 Usage:
-  $ sh ./webcube4.sh connect [--debug]
-  $ sh ./webcube4.sh disconnect [--debug]
+  $ bash webcube4.sh connect [--debug]
+  $ bash webcube4.sh disconnect [--debug]
 
 Notes:
   1. you need curl and node to be installed and in your PATH
@@ -54,7 +54,7 @@ Notes:
 To connect:
 
 ```bash
-$ ./webcube4.sh connect
+$ bash webcube4.sh connect
 [INFO] Getting index... done
 [INFO] Logging in... done
 [INFO] Connecting... done
@@ -64,7 +64,7 @@ $ ./webcube4.sh connect
 To disconnect:
 
 ```bash
-$ ./webcube4.sh disconnect
+$ bash webcube4.sh disconnect
 [INFO] Getting index... done
 [INFO] Logging in... done
 [INFO] Disconnecting... done
