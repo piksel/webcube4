@@ -1,6 +1,6 @@
 # webcube4
 
-A Bash script to connect/disconnect the WebCube4 4G/LTE router
+A Bash+Javascript script to connect/disconnect the WebCube4 (Huawei E8378) 4G/LTE router
 
 * Version: 1.0.0
 * Date: 2017-01-10
