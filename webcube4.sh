@@ -19,6 +19,7 @@ usage() {
   echo ""
   echo "Usage:"
   echo "  $ sh $0 connect [--debug]"
+  echo "  $ sh $0 reconnect [--debug]"
   echo "  $ sh $0 disconnect [--debug]"
   echo ""
   echo "Notes:"
@@ -65,6 +66,7 @@ NODE_EXEC="node"
 NODE_COMPUTE_JS="compute.js"
 
 CONNECT="connect"
+RECONNECT="reconnect"
 DISCONNECT="disconnect"
 
 PAGE_INDEX_STUB="/html/index.html"
@@ -127,7 +129,7 @@ fi
 
 # check that the first command is either "connect" or "disconnect"
 COMMAND="$1"
-if [ "$COMMAND" != "$CONNECT" ] && [ "$COMMAND" != "$DISCONNECT" ]
+if [ "$COMMAND" != "$CONNECT" ] && [ "$COMMAND" != "$DISCONNECT" ] && [ "$COMMAND" != "$RECONNECT" ]
 then
   printerror "Unknown command '$COMMAND'"
   usage
@@ -229,48 +231,59 @@ RV_TOKEN_ALL=`grep "__RequestVerificationToken:" "$HEADER2"`
 COOKIE2=`grep "Set-Cookie" "$HEADER2" | cut -d ":" -f 2 | cut -d ";" -f 1`
 printdebug "$DEBUG" "Cookie: '$COOKIE2'"
 
-# set the appropriate info message and request parameters
-MESSAGE=""
-RV_TOKEN_INDEX=-1
-if [ "$COMMAND" == "$CONNECT" ]
+do_action() {
+  printdebug "$DEBUG" "Action: $1"
+  # set the appropriate info message and request parameters
+  MESSAGE=""
+  RV_TOKEN_INDEX=-1
+  if [ "$1" == "$CONNECT" ]
+  then
+    MESSAGE="Connecting... "
+    RV_TOKEN_INDEX=4
+    REQ_ACTION=1
+  fi
+  if [ "$1" == "$DISCONNECT" ]
+  then
+    MESSAGE="Disconnecting... "
+    RV_TOKEN_INDEX=14
+    REQ_ACTION=0
+  fi
+
+  # get request verification token
+  RV_TOKEN=`echo "$RV_TOKEN_ALL" | cut -d "#" -f "$RV_TOKEN_INDEX"`
+  printdebug "$DEBUG" "RV Token: '$RV_TOKEN'"
+
+  # put request data into file and post it
+  echo -n "[INFO] $MESSAGE"
+  echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><request><Action>$REQ_ACTION</Action></request>" > "$DATA2"
+  curl \
+    -X POST \
+    --cookie "$COOKIE2" \
+    -d "@$DATA2" \
+    -H "__RequestVerificationToken: $RV_TOKEN" \
+    -D "$HEADER3" \
+    "$API_DIAL" > "$PAGE3" 2> /dev/null
+  echo "done"
+
+  # check result
+  IS_OK=`grep "OK" "$PAGE3" | wc -l`
+  if [ "$IS_OK" != "1" ]
+  then
+    printerror "Failure, something went wrong."
+    exit 1
+  fi
+
+  # success and exit
+  echo "[INFO] Success!"
+}
+
+if [ "$COMMAND" == "$RECONNECT" ]
 then
-  MESSAGE="Connecting... "
-  RV_TOKEN_INDEX=4
-  REQ_ACTION=1
+  do_action "$CONNECT"
+  do_action "$DISCONNECT"
+else
+  do_action "$COMMAND"
 fi
-if [ "$COMMAND" == "$DISCONNECT" ]
-then
-  MESSAGE="Disconnecting... "
-  RV_TOKEN_INDEX=14
-  REQ_ACTION=0
-fi
-
-# get request verification token
-RV_TOKEN=`echo "$RV_TOKEN_ALL" | cut -d "#" -f "$RV_TOKEN_INDEX"`
-printdebug "$DEBUG" "RV Token: '$RV_TOKEN'"
-
-# put request data into file and post it
-echo -n "[INFO] $MESSAGE"
-echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?><request><Action>$REQ_ACTION</Action></request>" > "$DATA2"
-curl \
-  -X POST \
-  --cookie "$COOKIE2" \
-  -d "@$DATA2" \
-  -H "__RequestVerificationToken: $RV_TOKEN" \
-  -D "$HEADER3" \
-  "$API_DIAL" > "$PAGE3" 2> /dev/null
-echo "done"
-
-# check result
-IS_OK=`grep "OK" "$PAGE3" | wc -l`
-if [ "$IS_OK" != "1" ]
-then
-  printerror "Failure, something went wrong."
-  exit 1
-fi
-
-# success and exit
-echo "[INFO] Success!"
 
 # remove tmp files, if already existing
 rm -f "$HEADER" "$PAGE" "$DATA" "$HEADER2" "$PAGE2" "$DATA2" "$HEADER3" "$PAGE3"
