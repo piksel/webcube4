@@ -280,8 +280,8 @@ do_action() {
 
 if [ "$COMMAND" == "$RECONNECT" ]
 then
-  do_action "$CONNECT"
   do_action "$DISCONNECT"
+  do_action "$CONNECT"
 else
   do_action "$COMMAND"
 fi
