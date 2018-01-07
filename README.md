@@ -43,12 +43,14 @@ $ bash webcube4.sh
 
 Usage:
   $ bash webcube4.sh connect [--debug]
+  $ bash webcube4.sh reconnect [--debug]"
   $ bash webcube4.sh disconnect [--debug]
 
 Notes:
   1. you need curl and node to be installed and in your PATH
-  2. put your router admin password in ~/.webcube4, e.g. by running:
-     $ echo "yourpass" > ~/.webcube4 && chmod 400 ~/.webcube4
+  2. put your router admin password in ~/.config/webcube4/password, e.g. by running:
+     $ echo "yourpass" > ~/.config/webcube4/password && chmod 400 ~/.config/webcube4/password
+  3. if your router is not located at 192.168.1.1, put your router IP in ~/.config/webcube4/webhost
 ```
 
 To connect:
@@ -71,6 +73,16 @@ $ bash webcube4.sh disconnect
 [INFO] Success!
 ```
 
+To reconnect:
+
+```bash
+$ bash webcube4.sh reconnect
+[INFO] Getting index... done
+[INFO] Logging in... done
+[INFO] Disconnecting... done
+[INFO] Connecting... done
+[INFO] Success!
+```
 
 ## License
 
