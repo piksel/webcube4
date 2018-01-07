@@ -143,11 +143,13 @@ fi
 if [ ! -d "$CONF_PATH" ]
 then
   printwarning "Creating missing config path '$CONF_PATH'."
+  mkdir -p $CONF_PATH
 fi
 
 if [ -e "$OLD_PASSWORD_FILE" ]
 then
   printwarning "Moving old password file '$OLD_PASSWORD_FILE' to '$PASSWORD_FILE'."
+  mv $OLD_PASSWORD_FILE $PASSWORD_FILE
 fi
 
 # read wifi password
