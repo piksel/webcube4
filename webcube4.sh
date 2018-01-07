@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # __author__ = "Alberto Pettarin"
 # __copyright__ = "Copyright 2017, Alberto Pettarin (www.albertopettarin.it)"
