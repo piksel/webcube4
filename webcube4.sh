@@ -26,7 +26,7 @@ usage() {
   echo "  1. you need curl and node to be installed and in your PATH"
   echo "  2. put your router admin password in ~/.config/webcube4/password, e.g. by running:"
   echo "     $ echo \"yourpass\" > ~/.config/webcube4/password && chmod 400 ~/.config/webcube4/password"
-  echo "  3. if your router is not located at 192.168.1.1, put your router IP in ~/.config/webcube4/webhost"
+  echo "  3. if your router is not located at 192.168.1.1, put your router IP in ~/.config/webcube4/webroot"
   echo ""
 }
 

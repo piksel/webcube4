@@ -50,7 +50,7 @@ Notes:
   1. you need curl and node to be installed and in your PATH
   2. put your router admin password in ~/.config/webcube4/password, e.g. by running:
      $ echo "yourpass" > ~/.config/webcube4/password && chmod 400 ~/.config/webcube4/password
-  3. if your router is not located at 192.168.1.1, put your router IP in ~/.config/webcube4/webhost
+  3. if your router is not located at 192.168.1.1, put your router IP in ~/.config/webcube4/webroot
 ```
 
 To connect:
