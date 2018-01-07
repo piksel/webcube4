@@ -35,6 +35,10 @@ printdebug() {
   fi
 }
 
+printwarning() {
+  echo "[WARN] $1"
+}
+
 printerror() {
   echo "[ERRO] $1"
 }
@@ -45,7 +49,16 @@ printerror() {
 #
 ##############################################################################
 
-WIFI_PASSWORD_FILE="$HOME/.webcube4"
+CONF_PATH="$HOME/.conf/webcube4"
+
+PASSWORD_FILE="$CONF_PATH/password"
+OLD_PASSWORD_FILE="$HOME/.webcube4"
+
+WEB_ROOT="192.168.1.1"
+WEB_ROOT_FILE="$CONF_PATH/webroot"
+
+API_USER="admin"
+API_USER_FILE="$CONF_PATH/user"
 
 CURL_EXEC="curl"
 NODE_EXEC="node"
@@ -54,10 +67,9 @@ NODE_COMPUTE_JS="compute.js"
 CONNECT="connect"
 DISCONNECT="disconnect"
 
-PAGE_INDEX="http://192.168.1.1/html/index.html"
-API_LOGIN="http://192.168.1.1/api/user/login"
-API_DIAL="http://192.168.1.1/api/dialup/dial"
-API_USER="admin"
+PAGE_INDEX_STUB="/html/index.html"
+API_LOGIN_STUB="/api/user/login"
+API_DIAL_STUB="/api/dialup/dial"
 
 HEADER="/tmp/webcube4.header"
 PAGE="/tmp/webcube4.page"
@@ -128,15 +140,44 @@ then
   DEBUG=1
 fi
 
-# read wifi password
-if [ ! -e "$WIFI_PASSWORD_FILE" ]
+if [ ! -d "$CONF_PATH" ]
 then
-  printerror "Unable to read file '$WIFI_PASSWORD_FILE'"
+  printwarning "Creating missing config path '$CONF_PATH'."
+fi
+
+if [ -e "$OLD_PASSWORD_FILE" ]
+then
+  printwarning "Moving old password file '$OLD_PASSWORD_FILE' to '$PASSWORD_FILE'."
+fi
+
+# read wifi password
+if [ ! -e "$PASSWORD_FILE" ]
+then
+  printerror "Unable to read file '$PASSWORD_FILE'"
   usage
   exit 1
 fi
-WIFI_PASSWORD=`cat "$WIFI_PASSWORD_FILE"`
+PASSWORD=`cat "$PASSWORD_FILE"`
 #printdebug "$DEBUG" "Password: '$WIFI_PASSWORD'"
+
+# read api user
+if [ -e "$API_USER_FILE" ]
+then
+  API_USER=`cat "$API_USER_FILE"`
+  printdebug "$DEBUG" "API User set: $API_USER"
+fi
+
+# read web root
+if [ -e "$WEB_ROOT_FILE" ]
+then
+  WEB_ROOT=`cat "$WEB_ROOT_FILE"`
+  printdebug "$DEBUG" "Web root set: $WEB_ROOT"
+fi
+
+# set urls
+PAGE_INDEX="http://$WEB_ROOT/html/index.html"
+API_LOGIN="http://$WEB_ROOT/api/user/login"
+API_DIAL="http://$WEB_ROOT/api/dialup/dial"
 
 # get index page and save header
 echo -n "[INFO] Getting index... "
@@ -156,7 +197,7 @@ printdebug "$DEBUG" "Token 1: '$CSRF_TOKEN_1'"
 printdebug "$DEBUG" "Token 2: '$CSRF_TOKEN_2'"
 
 # get password by running the JS
-LOGIN_PASSWORD=`node "$NODE_COMPUTE_JS" "$API_USER" "$WIFI_PASSWORD" "$CSRF_TOKEN_2"`
+LOGIN_PASSWORD=`node "$NODE_COMPUTE_JS" "$API_USER" "$PASSWORD" "$CSRF_TOKEN_2"`
 printdebug "$DEBUG" "Password: '$LOGIN_PASSWORD'"
 
 # put request data into file
